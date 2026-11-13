@@ -6,6 +6,8 @@ export interface MaterialLibrary {
   slateFloor: THREE.MeshStandardMaterial;
   terraceFloor: THREE.MeshStandardMaterial;
   wallPlaster: THREE.MeshStandardMaterial;
+  wallSoftGreen: THREE.MeshStandardMaterial;
+  wallMutedBlue: THREE.MeshStandardMaterial;
   wallDarkCap: THREE.MeshStandardMaterial;
   wallExterior: THREE.MeshStandardMaterial;
   ceilingPanel: THREE.MeshStandardMaterial;
@@ -80,8 +82,26 @@ export function createMaterialLibrary(
     map: textures.plasterAlbedo,
     bumpMap: textures.plasterBump,
     bumpScale: 0.008,
-    color: 0xf4efe7,
+    color: 0xf3ede2,
     roughness: 0.88,
+    metalness: 0.0,
+  });
+
+  const wallSoftGreen = new THREE.MeshStandardMaterial({
+    map: textures.plasterAlbedo,
+    bumpMap: textures.plasterBump,
+    bumpScale: 0.008,
+    color: 0xd0dccd,
+    roughness: 0.89,
+    metalness: 0.0,
+  });
+
+  const wallMutedBlue = new THREE.MeshStandardMaterial({
+    map: textures.plasterAlbedo,
+    bumpMap: textures.plasterBump,
+    bumpScale: 0.008,
+    color: 0xc9d5df,
+    roughness: 0.89,
     metalness: 0.0,
   });
 
@@ -385,6 +405,8 @@ export function createMaterialLibrary(
     slateFloor,
     terraceFloor,
     wallPlaster,
+    wallSoftGreen,
+    wallMutedBlue,
     wallDarkCap,
     wallExterior,
     ceilingPanel,
@@ -431,6 +453,8 @@ export function createMaterialLibrary(
     slateFloor,
     terraceFloor,
     wallPlaster,
+    wallSoftGreen,
+    wallMutedBlue,
     wallDarkCap,
     wallExterior,
     ceilingPanel,

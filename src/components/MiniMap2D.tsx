@@ -255,7 +255,7 @@ export const MiniMap2D: React.FC<MiniMap2DProps> = ({
           ))}
 
           {/* Bathroom slate tile floor */}
-          <rect x="1.6" y="2.6" width="1.8" height="3.6" fill={isDay ? '#d6d3cd' : '#1e2430'} />
+          <rect x="1.6" y="2.85" width="1.8" height="3.35" fill={isDay ? '#d6d3cd' : '#1e2430'} />
 
           {/* Main Reading Hall Furniture Silhouettes */}
           {/* Marble Collaborative Table */}
@@ -315,16 +315,16 @@ export const MiniMap2D: React.FC<MiniMap2DProps> = ({
             <line x1="3.4" y1="-3.3" x2="9.0" y2="-3.3" />
             <line x1="4.0" y1="-6.2" x2="4.0" y2="-3.3" />
             {/* Quiet Studio & Innovation Hub West Divider */}
-            <line x1="3.4" y1="-3.3" x2="3.4" y2="-0.5" />
-            <line x1="3.4" y1="0.8" x2="3.4" y2="1.7" />
-            <line x1="3.4" y1="2.8" x2="3.4" y2="6.2" />
+            <line x1="3.4" y1="-3.3" x2="3.4" y2="-0.22" />
+            <line x1="3.4" y1="0.78" x2="3.4" y2="1.58" />
+            <line x1="3.4" y1="2.58" x2="3.4" y2="6.2" />
             {/* Quiet / Innovation divider */}
             <line x1="3.4" y1="1.3" x2="9.0" y2="1.3" />
             {/* Lower Pantry & WC */}
-            <line x1="-0.6" y1="2.6" x2="0.2" y2="2.6" />
-            <line x1="1.2" y1="2.6" x2="2.0" y2="2.6" />
-            <line x1="2.9" y1="2.6" x2="3.4" y2="2.6" />
-            <line x1="1.6" y1="2.6" x2="1.6" y2="6.2" />
+            <line x1="-0.6" y1="2.85" x2="0.2" y2="2.85" />
+            <line x1="1.2" y1="2.85" x2="2.0" y2="2.85" />
+            <line x1="2.9" y1="2.85" x2="3.4" y2="2.85" />
+            <line x1="1.6" y1="2.85" x2="1.6" y2="6.2" />
           </g>
 
           {/* Stairwell lines */}

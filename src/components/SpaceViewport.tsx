@@ -93,8 +93,8 @@ function resolveRoomName(x: number, y: number, z: number): string {
   if (x >= 3.4 && z >= 1.3) return 'Innovation Hub';
   if (x >= 2.1 && z < -3.3) return 'Main Entrance · Corridor';
   if (x < 2.1 && z < -2.9) return 'Upper Pantry / Break Room';
-  if (x < 1.6 && z >= 2.6) return 'Lower Pantry / Break Room';
-  if (x >= 1.6 && x < 3.4 && z >= 2.6) return 'Bathroom / W.C.';
+  if (x < 1.6 && z >= 2.85) return 'Lower Pantry / Break Room';
+  if (x >= 1.6 && x < 3.4 && z >= 2.85) return 'Bathroom / W.C.';
   return 'Reception / Lobby';
 }
 

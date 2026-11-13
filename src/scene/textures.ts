@@ -376,12 +376,25 @@ function createPlasterTextures(maxAnisotropy: number) {
   bumpCanvas.height = size;
   const bCtx = bumpCanvas.getContext('2d')!;
 
-  ctx.fillStyle = '#ebe5dc';
+  ctx.fillStyle = '#f2ede4';
   ctx.fillRect(0, 0, size, size);
   bCtx.fillStyle = '#808080';
   bCtx.fillRect(0, 0, size, size);
 
   const rand = seededRandom(3344);
+
+  // Soft architectural limewash clouds for natural depth on tinted walls
+  for (let c = 0; c < 36; c++) {
+    const cx = rand() * size;
+    const cy = rand() * size;
+    const radius = 55 + rand() * 110;
+    const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
+    grad.addColorStop(0, c % 2 === 0 ? 'rgba(255, 253, 249, 0.14)' : 'rgba(218, 212, 202, 0.12)');
+    grad.addColorStop(1, 'rgba(242, 237, 228, 0)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, size, size);
+  }
+
   for (let i = 0; i < 3500; i++) {
     const x = rand() * size;
     const y = rand() * size;

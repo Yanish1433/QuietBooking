@@ -104,7 +104,8 @@ function addWallSegment(
   z2: number,
   height = WALL_H,
   thickness = WALL_T,
-  baseY = 0
+  baseY = 0,
+  wallMat: THREE.Material = mats.wallPlaster
 ) {
   const dx = x2 - x1;
   const dz = z2 - z1;
@@ -121,7 +122,7 @@ function addWallSegment(
 
   const body = new THREE.Mesh(
     new THREE.BoxGeometry(thickness, height, length),
-    mats.wallPlaster
+    wallMat
   );
   body.position.y = height / 2;
   body.castShadow = true;
@@ -247,7 +248,8 @@ function addWallWithDoorway(
   doorWidth: number,
   doorHeight = 2.28,
   addDoorLeaf = true,
-  openAngle = 0.78
+  openAngle = 0.78,
+  wallMat: THREE.Material = mats.wallPlaster
 ) {
   const dx = x2 - x1;
   const dz = z2 - z1;
@@ -260,10 +262,36 @@ function addWallWithDoorway(
   const dEnd = Math.min(totalLen - 0.05, doorCenter + doorWidth / 2);
 
   if (dStart > 0.08) {
-    addWallSegment(parent, colliders, wallMeshes, mats, x1, z1, x1 + ux * dStart, z1 + uz * dStart);
+    addWallSegment(
+      parent,
+      colliders,
+      wallMeshes,
+      mats,
+      x1,
+      z1,
+      x1 + ux * dStart,
+      z1 + uz * dStart,
+      WALL_H,
+      WALL_T,
+      0,
+      wallMat
+    );
   }
   if (totalLen - dEnd > 0.08) {
-    addWallSegment(parent, colliders, wallMeshes, mats, x1 + ux * dEnd, z1 + uz * dEnd, x2, z2);
+    addWallSegment(
+      parent,
+      colliders,
+      wallMeshes,
+      mats,
+      x1 + ux * dEnd,
+      z1 + uz * dEnd,
+      x2,
+      z2,
+      WALL_H,
+      WALL_T,
+      0,
+      wallMat
+    );
   }
 
   addWallSegment(
@@ -277,7 +305,8 @@ function addWallWithDoorway(
     z1 + uz * dEnd,
     WALL_H - doorHeight,
     WALL_T,
-    doorHeight
+    doorHeight,
+    wallMat
   );
 
   const capGroup = new THREE.Group();
@@ -314,7 +343,7 @@ export function buildArchitecturalFloorplan(mats: MaterialLibrary): FloorplanSce
   groundPlinth.receiveShadow = true;
   root.add(groundPlinth);
 
-  const gardenMat = new THREE.MeshStandardMaterial({ color: 0x4c6244, roughness: 0.92 });
+  const gardenMat = new THREE.MeshStandardMaterial({ color: 0x6f846b, roughness: 0.92 });
   const gardenPlane = new THREE.Mesh(new THREE.PlaneGeometry(80, 80), gardenMat);
   gardenPlane.rotation.x = -Math.PI / 2;
   gardenPlane.position.y = -0.31;
@@ -335,7 +364,7 @@ export function buildArchitecturalFloorplan(mats: MaterialLibrary): FloorplanSce
     root.add(extPlant);
   }
 
-  const exteriorSkyMat = new THREE.MeshBasicMaterial({ color: 0xcfe2f2, side: THREE.BackSide });
+  const exteriorSkyMat = new THREE.MeshBasicMaterial({ color: 0xc8d8e2, side: THREE.BackSide });
   const exteriorSkyBackdrop = new THREE.Mesh(
     new THREE.SphereGeometry(55, 32, 20),
     exteriorSkyMat
@@ -349,9 +378,9 @@ export function buildArchitecturalFloorplan(mats: MaterialLibrary): FloorplanSce
   mainFloor.receiveShadow = true;
   root.add(mainFloor);
 
-  const bathFloor = new THREE.Mesh(new THREE.PlaneGeometry(1.8, 3.6), mats.slateFloor);
+  const bathFloor = new THREE.Mesh(new THREE.PlaneGeometry(1.8, 3.35), mats.slateFloor);
   bathFloor.rotation.x = -Math.PI / 2;
-  bathFloor.position.set(2.5, 0.008, 4.4);
+  bathFloor.position.set(2.5, 0.008, 4.525);
   bathFloor.receiveShadow = true;
   root.add(bathFloor);
 
@@ -405,24 +434,104 @@ export function buildArchitecturalFloorplan(mats: MaterialLibrary): FloorplanSce
   addWallSegment(root, colliders, wallMeshes, mats, 7.5, 6.2, 9.0, 6.2);
 
   // =========================================================================
-  // INTERIOR PARTITION WALLS & DOORWAYS
+  // INTERIOR PARTITION WALLS & DOORWAYS (Soft Greens, Muted Blues & Warm Neutrals)
   // =========================================================================
-  addWallWithDoorway(root, colliders, wallMeshes, mats, -0.6, -6.2, -0.6, 6.2, 0.5, 1.9, 2.48, false);
-  addWallSegment(root, colliders, wallMeshes, mats, 2.1, -6.2, 2.1, -2.9);
-  addWallWithDoorway(root, colliders, wallMeshes, mats, -0.6, -2.9, 2.1, -2.9, 0.72, 0.96, 2.25, true, -0.82);
+  // Main Reading Hall <-> Reception divider (Soft Sage Green)
+  addWallWithDoorway(
+    root,
+    colliders,
+    wallMeshes,
+    mats,
+    -0.6,
+    -6.2,
+    -0.6,
+    6.2,
+    0.5,
+    1.9,
+    2.48,
+    false,
+    0.78,
+    mats.wallSoftGreen
+  );
+  // Reception north & pantry backdrop walls (Muted Mist Blue)
+  addWallSegment(root, colliders, wallMeshes, mats, 2.1, -6.2, 2.1, -2.9, WALL_H, WALL_T, 0, mats.wallMutedBlue);
+  addWallWithDoorway(
+    root,
+    colliders,
+    wallMeshes,
+    mats,
+    -0.6,
+    -2.9,
+    2.1,
+    -2.9,
+    0.72,
+    0.96,
+    2.25,
+    true,
+    -0.82,
+    mats.wallMutedBlue
+  );
 
-  addWallWithDoorway(root, colliders, wallMeshes, mats, 2.1, -3.3, 3.6, -3.3, 0.5, 1.15, 2.35, true, 0.85);
-  addWallSegment(root, colliders, wallMeshes, mats, 3.6, -3.3, 9.0, -3.3);
-  addWallSegment(root, colliders, wallMeshes, mats, 4.0, -6.2, 4.0, -3.3);
+  // Entrance corridor & Quiet Study Studio north wall (Muted Blue entrance, Soft Green Quiet Studio)
+  addWallWithDoorway(
+    root,
+    colliders,
+    wallMeshes,
+    mats,
+    2.1,
+    -3.3,
+    3.6,
+    -3.3,
+    0.5,
+    1.15,
+    2.35,
+    true,
+    0.85,
+    mats.wallMutedBlue
+  );
+  addWallSegment(root, colliders, wallMeshes, mats, 3.6, -3.3, 9.0, -3.3, WALL_H, WALL_T, 0, mats.wallSoftGreen);
+  addWallSegment(root, colliders, wallMeshes, mats, 4.0, -6.2, 4.0, -3.3, WALL_H, WALL_T, 0, mats.wallPlaster);
 
-  addWallSegment(root, colliders, wallMeshes, mats, 3.4, -3.3, 3.4, -0.5);
-  addWallWithDoorway(root, colliders, wallMeshes, mats, 3.4, -0.5, 3.4, 1.3, 0.42, 0.98, 2.25, true, 0.84);
-  addWallWithDoorway(root, colliders, wallMeshes, mats, 3.4, 1.3, 3.4, 6.2, 0.19, 1.0, 2.25, true, 0.82);
-  addWallSegment(root, colliders, wallMeshes, mats, 3.4, 1.3, 9.0, 1.3);
+  // Quiet Study Studio west wall (Soft Green) & Innovation Hub west/north walls (Muted Blue)
+  addWallSegment(root, colliders, wallMeshes, mats, 3.4, -3.3, 3.4, -0.75, WALL_H, WALL_T, 0, mats.wallSoftGreen);
+  addWallWithDoorway(
+    root,
+    colliders,
+    wallMeshes,
+    mats,
+    3.4,
+    -0.75,
+    3.4,
+    1.3,
+    0.5,
+    1.0,
+    2.25,
+    true,
+    0.88,
+    mats.wallSoftGreen
+  );
+  addWallWithDoorway(
+    root,
+    colliders,
+    wallMeshes,
+    mats,
+    3.4,
+    1.3,
+    3.4,
+    6.2,
+    0.16,
+    1.0,
+    2.25,
+    true,
+    -0.86,
+    mats.wallMutedBlue
+  );
+  addWallSegment(root, colliders, wallMeshes, mats, 3.4, 1.3, 9.0, 1.3, WALL_H, WALL_T, 0, mats.wallMutedBlue);
 
-  addWallWithDoorway(root, colliders, wallMeshes, mats, -0.6, 2.6, 1.6, 2.6, 0.56, 0.92, 2.25, true, -0.78);
-  addWallWithDoorway(root, colliders, wallMeshes, mats, 1.6, 2.6, 3.4, 2.6, 0.46, 0.88, 2.25, true, -0.78);
-  addWallSegment(root, colliders, wallMeshes, mats, 1.6, 2.6, 1.6, 6.2);
+  // Lower Pantry & Bathroom partitions (Warm Neutral plaster)
+  addWallWithDoorway(root, colliders, wallMeshes, mats, -0.6, 2.85, 1.6, 2.85, 0.56, 0.92, 2.25, true, -0.78);
+  addWallWithDoorway(root, colliders, wallMeshes, mats, 1.6, 2.85, 3.4, 2.85, 0.46, 0.88, 2.25, true, -0.78);
+  addWallSegment(root, colliders, wallMeshes, mats, 1.6, 2.85, 1.6, 6.2);
 
   // =========================================================================
   // ARCHITECTURAL DOORWAY ROOM PLAQUES (cleanly mounted on doorway lintels)
@@ -448,14 +557,14 @@ export function buildArchitecturalFloorplan(mats: MaterialLibrary): FloorplanSce
   addSign('reading-hall', -0.49, 2.76, 0, Math.PI / 2, 1.16, 0.28);
   addSign('reception', -0.71, 2.76, 0, -Math.PI / 2, 1.16, 0.28);
   // Reception -> Quiet Study Studio
-  addSign('quiet-studio', 3.29, 2.52, 0.256, -Math.PI / 2, 0.92, 0.24);
-  // Reception -> Innovation Hub
-  addSign('innovation-hub', 3.29, 2.52, 2.231, -Math.PI / 2, 0.92, 0.24);
+  addSign('quiet-studio', 3.29, 2.52, 0.275, -Math.PI / 2, 0.94, 0.24);
+  // Reception -> Innovation Hub (centered at z=2.084, completely clear of Bathroom corner at z=2.75)
+  addSign('innovation-hub', 3.29, 2.52, 2.084, -Math.PI / 2, 0.94, 0.24);
   // Reception -> Upper & Lower Pantry / Break Rooms
   addSign('pantry', 1.344, 2.52, -2.79, 0, 0.88, 0.23);
-  addSign('pantry', 0.632, 2.52, 2.49, Math.PI, 0.88, 0.23);
+  addSign('pantry', 0.632, 2.52, 2.74, Math.PI, 0.88, 0.23);
   // Reception -> Bathroom / W.C.
-  addSign('bathroom', 2.428, 2.52, 2.49, Math.PI, 0.86, 0.23);
+  addSign('bathroom', 2.428, 2.52, 2.74, Math.PI, 0.86, 0.23);
 
   // =========================================================================
   // STAIRWELL IN COMMON CORRIDOR (steps + center balustrade & handrail)
@@ -570,16 +679,11 @@ export function buildArchitecturalFloorplan(mats: MaterialLibrary): FloorplanSce
     });
   });
 
-  const quietShelf = createBookshelfUnit(mats, 1.9, 2.35, 0.36, 5, true);
+  const quietShelf = createBookshelfUnit(mats, 1.85, 2.35, 0.36, 5, true);
   quietShelf.rotation.y = Math.PI / 2;
-  quietShelf.position.set(3.68, 0, -1.9);
+  quietShelf.position.set(3.68, 0, -1.85);
   root.add(quietShelf);
-  colliders.push({ minX: 3.45, maxX: 3.9, minZ: -2.9, maxZ: -0.9 });
-
-  const quietShelfSouth = createBookshelfUnit(mats, 1.25, 2.25, 0.36, 4, true);
-  quietShelfSouth.rotation.y = Math.PI / 2;
-  quietShelfSouth.position.set(3.68, 0, 0.65);
-  root.add(quietShelfSouth);
+  colliders.push({ minX: 3.45, maxX: 3.9, minZ: -2.8, maxZ: -0.9 });
 
   const quietPlant = createPottedPlant(mats, 1.15, 14);
   quietPlant.position.set(3.98, 0, -2.92);
@@ -637,12 +741,12 @@ export function buildArchitecturalFloorplan(mats: MaterialLibrary): FloorplanSce
     root.add(pull);
   }
 
-  for (const sx of [4.35, 8.05]) {
-    const shelf = createBookshelfUnit(mats, 1.05, 2.25, 0.36, 4, true);
+  for (const sx of [4.5, 8.05]) {
+    const shelf = createBookshelfUnit(mats, 1.0, 2.25, 0.36, 4, true);
     shelf.position.set(sx, 0, 1.6);
     root.add(shelf);
   }
-  colliders.push({ minX: 3.7, maxX: 8.7, minZ: 1.38, maxZ: 1.82 });
+  colliders.push({ minX: 3.95, maxX: 8.7, minZ: 1.38, maxZ: 1.82 });
 
   const hubTable = createMarbleTable(mats, 3.2, 1.35, 0.75, true);
   hubTable.position.set(6.2, 0, 3.8);
@@ -710,7 +814,7 @@ export function buildArchitecturalFloorplan(mats: MaterialLibrary): FloorplanSce
   }
 
   for (const [px, pz, s] of [
-    [3.82, 1.75, 1.1],
+    [3.72, 1.56, 0.95],
     [8.58, 1.75, 1.1],
     [3.85, 5.75, 0.95],
     [8.55, 5.75, 0.95],

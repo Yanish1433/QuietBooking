@@ -213,7 +213,11 @@ export default function App() {
   const isDay = lightingMode === 'day';
 
   return (
-    <main className="relative w-screen h-dvh overflow-hidden bg-stone-950">
+    <main
+      className={`relative w-screen h-dvh overflow-hidden transition-colors duration-300 ${
+        isDay ? 'bg-[#e7e2d8]' : lightingMode === 'evening' ? 'bg-[#2c343f]' : 'bg-[#0c131d]'
+      }`}
+    >
       <SpaceViewport
         lightingMode={lightingMode}
         activePreset={activePreset}
