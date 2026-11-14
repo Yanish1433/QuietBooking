@@ -8,6 +8,7 @@ import {
   ChevronDown,
   ChevronUp,
   Compass,
+  Home,
   Map as MapIcon,
   MessageSquareHeart,
   Moon,
@@ -38,6 +39,7 @@ interface ControlDockProps {
   onToggleMap: () => void;
   onToggleGuide: () => void;
   onToggleCollapse: () => void;
+  onReturnHome?: () => void;
 }
 
 const PRESETS: { id: CameraPresetId; label: string }[] = [
@@ -76,6 +78,7 @@ export const ControlDock: React.FC<ControlDockProps> = ({
   onToggleMap,
   onToggleGuide,
   onToggleCollapse,
+  onReturnHome,
 }) => {
   const isDay = lightingMode === 'day';
   const isEvening = lightingMode === 'evening';
@@ -125,8 +128,20 @@ export const ControlDock: React.FC<ControlDockProps> = ({
       {/* Responsive Top Spatial Header (fits 320px+ phones through 4K desktops cleanly) */}
       <header className="pointer-events-none fixed top-2 sm:top-4 left-2 sm:left-4 right-2 sm:right-4 z-20 flex items-center justify-between gap-1.5 sm:gap-2">
         <div
-          className={`pointer-events-auto flex items-center gap-1.5 sm:gap-3 px-2.5 sm:px-4 py-1.5 sm:py-2.5 rounded-xl border transition-colors duration-300 min-w-0 ${surfaceClass}`}
+          className={`pointer-events-auto flex items-center gap-1.5 sm:gap-3 px-2 sm:px-4 py-1.5 sm:py-2.5 rounded-xl border transition-colors duration-300 min-w-0 ${surfaceClass}`}
         >
+          {onReturnHome && (
+            <button
+              type="button"
+              onClick={onReturnHome}
+              aria-label="Back to Overview Page"
+              title="Back to Overview Page"
+              className="flex items-center gap-1 px-1.5 sm:px-2 py-1 rounded-lg hover:bg-current/10 transition-colors cursor-pointer shrink-0"
+            >
+              <Home className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline text-xs font-medium">Home</span>
+            </button>
+          )}
           <span className="font-display text-xs sm:text-base font-semibold tracking-tight whitespace-nowrap shrink-0">
             Atelier<span className="hidden xs:inline sm:inline"> Study</span>
           </span>

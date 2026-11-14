@@ -297,8 +297,9 @@ export const SpaceViewport: React.FC<SpaceViewportProps> = ({
       120
     );
 
-    const initPos = new THREE.Vector3(...PRESET_VIEWS.entrance.pos);
-    const initLook = new THREE.Vector3(...PRESET_VIEWS.entrance.look);
+    const initSpec = PRESET_VIEWS[activePresetRef.current] ?? PRESET_VIEWS.entrance;
+    const initPos = new THREE.Vector3(...initSpec.pos);
+    const initLook = new THREE.Vector3(...initSpec.look);
     const initAngles = computeYawPitch(initPos, initLook);
     let camYaw = initAngles.yaw;
     let camPitch = initAngles.pitch;

@@ -10,6 +10,7 @@ import { BookingOverlay } from './components/BookingOverlay';
 import { BookingsDrawer } from './components/BookingsDrawer';
 import { MiniMap2D } from './components/MiniMap2D';
 import { ReceptionistGuideModal } from './components/ReceptionistGuideModal';
+import { LandingPage } from './components/LandingPage';
 import type {
   BookableTargetKind,
   BookingPlan,
@@ -25,6 +26,7 @@ import type {
 const LOCAL_STORAGE_KEY = 'atelier_study_bookings_v1';
 
 export default function App() {
+  const [viewMode, setViewMode] = useState<'landing' | '3d'>('landing');
   const [lightingMode, setLightingMode] = useState<LightingMode>('day');
   const [activePreset, setActivePreset] = useState<CameraPresetId>('entrance');
   const [presetTrigger, setPresetTrigger] = useState<number>(0);
@@ -53,6 +55,7 @@ export default function App() {
   const [dockCollapsed, setDockCollapsed] = useState<boolean>(false);
   const [noticeMsg, setNoticeMsg] = useState<string | null>(null);
   const noticeTimerRef = useRef<number | null>(null);
+  const pendingFocusChairIdRef = useRef<string | null>(null);
 
   const movementInputRef = useRef<MovementInputState>({
     forward: false,
@@ -119,6 +122,31 @@ export default function App() {
     }, 4200);
   }, []);
 
+  const handleEnter3D = useCallback((preset: CameraPresetId = 'entrance') => {
+    setActivePreset(preset);
+    setPresetTrigger((n) => n + 1);
+    setViewMode('3d');
+    window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
+  }, []);
+
+  const handleReserveHeroDesk = useCallback(() => {
+    const bookedIds = new Set(bookings.map((b) => b.chairId));
+    const openQuietId =
+      ['Q2', 'Q1', 'Q3', 'Q4', 'Q6', 'Q5'].find((id) => !bookedIds.has(id)) ?? 'Q2';
+    setActivePreset('quiet-studio');
+    setPresetTrigger((n) => n + 1);
+    pendingFocusChairIdRef.current = openQuietId;
+    setViewMode('3d');
+    window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
+  }, [bookings]);
+
+  const handleReturnHome = useCallback(() => {
+    setSelectedChair(null);
+    setGuideOpen(false);
+    setViewMode('landing');
+    window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
+  }, []);
+
   const handleSelectPreset = useCallback((preset: CameraPresetId) => {
     setActivePreset(preset);
     setPresetTrigger((n) => n + 1);
@@ -126,6 +154,19 @@ export default function App() {
 
   const handleUserCameraOverride = useCallback(() => {
     // Allow free movement without keeping preset locked
+  }, []);
+
+  const handleCatalogReady = useCallback((catalog: Record<string, StudyChairMetadata>) => {
+    setChairCatalog(catalog);
+    const pendingId = pendingFocusChairIdRef.current;
+    if (pendingId && catalog[pendingId]) {
+      pendingFocusChairIdRef.current = null;
+      setSelectedChair(catalog[pendingId]);
+      setFocusChairRequest((prev) => ({
+        chairId: pendingId,
+        seq: (prev?.seq ?? 0) + 1,
+      }));
+    }
   }, []);
 
   const handleSelectChair = useCallback((chair: StudyChairMetadata) => {
@@ -195,12 +236,15 @@ export default function App() {
     (chairId: string) => {
       const meta = chairCatalog[chairId];
       setBookingsDrawerOpen(false);
+      setViewMode('3d');
       if (meta) {
         setSelectedChair(meta);
         setFocusChairRequest((prev) => ({
           chairId,
           seq: (prev?.seq ?? 0) + 1,
         }));
+      } else {
+        pendingFocusChairIdRef.current = chairId;
       }
     },
     [chairCatalog]
@@ -212,9 +256,33 @@ export default function App() {
 
   const isDay = lightingMode === 'day';
 
+  if (viewMode === 'landing') {
+    return (
+      <>
+        <LandingPage
+          lightingMode={lightingMode}
+          bookings={bookings}
+          onLightingChange={setLightingMode}
+          onEnter3D={handleEnter3D}
+          onReserveHeroDesk={handleReserveHeroDesk}
+          onOpenBookings={() => setBookingsDrawerOpen(true)}
+        />
+        {bookingsDrawerOpen && (
+          <BookingsDrawer
+            bookings={bookings}
+            lightingMode={lightingMode}
+            onClose={() => setBookingsDrawerOpen(false)}
+            onFocusChair={handleFocusChair}
+            onCancelBooking={handleCancelBooking}
+          />
+        )}
+      </>
+    );
+  }
+
   return (
     <main
-      className={`relative w-screen h-dvh overflow-hidden transition-colors duration-300 ${
+      className={`relative w-screen h-dvh overflow-hidden select-none transition-colors duration-300 ${
         isDay ? 'bg-[#e7e2d8]' : lightingMode === 'evening' ? 'bg-[#2c343f]' : 'bg-[#0c131d]'
       }`}
     >
@@ -231,7 +299,7 @@ export default function App() {
         onSelectChair={handleSelectChair}
         onOpenGuide={() => setGuideOpen(true)}
         onNoticeMessage={showNotice}
-        onCatalogReady={setChairCatalog}
+        onCatalogReady={handleCatalogReady}
         onRoomChange={setCurrentRoom}
         onPoseChange={setPlayerPose}
         onUserCameraOverride={handleUserCameraOverride}
@@ -253,6 +321,7 @@ export default function App() {
         onToggleMap={() => setMapOpen((v) => !v)}
         onToggleGuide={() => setGuideOpen((v) => !v)}
         onToggleCollapse={() => setDockCollapsed((v) => !v)}
+        onReturnHome={handleReturnHome}
       />
 
       {/* Interactive 2D Floorplan Map (Corner HUD on Desktop, Overlay on Phones) */}
